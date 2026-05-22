@@ -37,9 +37,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
           imageUrl = await CloudinaryService.uploadImage(_image!);
         } catch (e) {
           imageUrl = null;
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Aviso: no se pudo subir la imagen, se guardará sin imagen.')),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('La imagen no se pudo subir, pero el producto se guardó sin imagen.')),
+            );
+          }
         }
       }
       await ApiService.createProduct(
