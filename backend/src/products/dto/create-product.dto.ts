@@ -5,6 +5,14 @@ export class CreateProductDto {
   @IsString()
   title: string;
 
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @IsNotEmpty()
+  @IsString()
+  tags: string;
+
   @IsOptional()
   @IsString()
   description?: string;

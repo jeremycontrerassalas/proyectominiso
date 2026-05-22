@@ -18,11 +18,19 @@ class ApiService {
     throw Exception('Failed to load products');
   }
 
-  static Future<Product> createProduct({required String title, String? description, String? imageUrl}) async {
+  static Future<Product> createProduct({
+    required String title,
+    required String code,
+    required String tags,
+    String? description,
+    String? imageUrl,
+  }) async {
     final res = await http.post(Uri.parse('$baseUrl/products'),
         headers: {HttpHeaders.contentTypeHeader: 'application/json'},
         body: jsonEncode({
           'title': title,
+          'code': code,
+          'tags': tags,
           'description': description,
           'imageUrl': imageUrl,
         }));

@@ -7,12 +7,36 @@ class ProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: product.imageUrl != null
-          ? Image.network(product.imageUrl!, width: 56, height: 56, fit: BoxFit.cover)
-          : Container(width: 56, height: 56, color: Colors.grey[300]),
-      title: Text(product.title),
-      subtitle: Text(product.description ?? ''),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: product.imageUrl != null
+                ? Image.network(product.imageUrl!, fit: BoxFit.cover)
+                : Container(color: Colors.grey[300], child: const Icon(Icons.image, size: 48)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(product.title, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                Text('Código: ${product.code ?? '-'}'),
+                const SizedBox(height: 4),
+                Text('Etiquetas: ${product.tags ?? '-'}'),
+                if ((product.description ?? '').isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(product.description!),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

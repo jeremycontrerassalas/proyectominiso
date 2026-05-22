@@ -8,6 +8,12 @@ export class Product {
   @Column({ type: 'text' })
   title!: string;
 
+  @Column({ type: 'text', name: 'product_code', nullable: true })
+  code!: string;
+
+  @Column({ type: 'text', nullable: true })
+  tags!: string;
+
   @Column({ type: 'text', nullable: true })
   description?: string;
 

@@ -18,6 +18,8 @@ export class ProductsService {
   create(dto: CreateProductDto): Promise<Product> {
     const product = this.repo.create({
       title: dto.title,
+      code: dto.code,
+      tags: dto.tags,
       description: dto.description,
       imageUrl: dto.imageUrl,
     });

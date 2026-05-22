@@ -14,6 +14,8 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _title;
+  String? _code;
+  String? _tags;
   String? _description;
   File? _image;
   bool _loading = false;
@@ -31,7 +33,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
     try {
       String? imageUrl;
       if (_image != null) imageUrl = await CloudinaryService.uploadImage(_image!);
-      await ApiService.createProduct(title: _title!, description: _description, imageUrl: imageUrl);
+      await ApiService.createProduct(
+        title: _title!,
+        code: _code!,
+        tags: _tags!,
+        description: _description,
+        imageUrl: imageUrl,
+      );
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
@@ -67,6 +75,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 decoration: const InputDecoration(labelText: 'Título'),
                 validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
                 onSaved: (v) => _title = v,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Código del producto'),
+                validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
+                onSaved: (v) => _code = v,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Etiquetas'),
+                hintText: 'Ej: top ventas, nuevo, oferta',
+                validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
+                onSaved: (v) => _tags = v,
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Descripción'),
