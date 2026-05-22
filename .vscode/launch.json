@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter: Run (emulator)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/flutter_app",
+      "args": [
+        "--dart-define=API_BASE=http://10.0.2.2:3000",
+        "--dart-define=CLOUDINARY_CLOUD_NAME=your_cloud_name",
+        "--dart-define=CLOUDINARY_UPLOAD_PRESET=your_preset"
+      ]
+    },
+    {
+      "name": "NestJS: Start (dev)",
+      "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/backend/.env"
+    }
+  ]
+}
