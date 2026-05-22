@@ -15,6 +15,10 @@ export class ProductsService {
     return this.repo.find({ order: { createdAt: 'DESC' } });
   }
 
+  async debugDb(): Promise<unknown> {
+    return this.repo.query('SELECT 1 AS ok');
+  }
+
   create(dto: CreateProductDto): Promise<Product> {
     const product = this.repo.create({
       title: dto.title,

@@ -32,7 +32,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
     setState(() => _loading = true);
     try {
       String? imageUrl;
-      if (_image != null) imageUrl = await CloudinaryService.uploadImage(_image!);
+      if (_image != null) {
+        try {
+          imageUrl = await CloudinaryService.uploadImage(_image!);
+        } catch (e) {
+          imageUrl = null;
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Aviso: no se pudo subir la imagen, se guardará sin imagen.')),
+          );
+        }
+      }
       await ApiService.createProduct(
         title: _title!,
         code: _code!,
@@ -82,8 +91,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 onSaved: (v) => _code = v,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Etiquetas'),
-                hintText: 'Ej: top ventas, nuevo, oferta',
+                decoration: const InputDecoration(
+                  labelText: 'Etiquetas',
+                  hintText: 'Ej: top ventas, nuevo, oferta',
+                ),
                 validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
                 onSaved: (v) => _tags = v,
               ),
