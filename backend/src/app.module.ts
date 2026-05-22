@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
+import { HealthController } from './health.controller';
 import { DataSourceOptions } from 'typeorm';
 import * as dotenv from 'dotenv';
 
@@ -35,6 +36,7 @@ const ormConfig: DataSourceOptions = {
 };
 
 @Module({
+  controllers: [HealthController],
   imports: [TypeOrmModule.forRoot(ormConfig), ProductsModule],
 })
 export class AppModule {}

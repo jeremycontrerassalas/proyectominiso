@@ -6,7 +6,7 @@ import '../models/product.dart';
 class ApiService {
   // Set this to your Railway backend URL for release APKs.
   // You can still override it with --dart-define=API_BASE=... when needed.
-  static const String productionBaseUrl = 'https://YOUR-BACKEND.up.railway.app';
+  static const String productionBaseUrl = 'https://proyectominiso-production.up.railway.app';
   static const String baseUrl = String.fromEnvironment('API_BASE', defaultValue: productionBaseUrl);
 
   static Future<List<Product>> fetchProducts() async {
