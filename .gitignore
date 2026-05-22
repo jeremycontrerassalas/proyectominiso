@@ -36,6 +36,8 @@ migrate_working_dir/
 **/node_modules/
 **/.env
 **/.env.*
+**/dist/
+**/tsconfig.tsbuildinfo
 
 # Symbolication related
 app.*.symbols
