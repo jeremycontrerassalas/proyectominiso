@@ -53,3 +53,15 @@ npm run start:dev
 ```
 
 The server will be available at `http://localhost:3000`.
+
+## Railway deploy
+
+If you deploy this repository as a monorepo, set the Railway service root directory to `backend`.
+
+Recommended Railway settings for the backend service:
+
+- Root directory: `backend`
+- Build command: `npm run build`
+- Start command: `npm run start`
+
+The backend folder also includes `railway.json`, so Railway can read the build and start commands from the app code once the service root points to `backend`.
