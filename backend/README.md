@@ -65,3 +65,9 @@ Recommended Railway settings for the backend service:
 - Start command: `npm run start`
 
 The backend folder also includes `railway.json`, so Railway can read the build and start commands from the app code once the service root points to `backend`.
+
+## Root Docker deploy
+
+If Railway is still pointed at the repository root, it will now find the top-level `Dockerfile` and build only the NestJS backend from `backend/`.
+
+This avoids the Flutter app in the repo root from being used as the deployment target.
