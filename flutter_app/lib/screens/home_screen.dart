@@ -20,10 +20,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _future = ApiService.fetchProducts();
   }
 
-  void _refresh() {
+  Future<void> _refresh() async {
     setState(() {
       _future = ApiService.fetchProducts();
     });
+    await _future;
   }
 
   @override
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.add),
             onPressed: () async {
               await Navigator.pushNamed(context, '/add');
-              _refresh();
+              await _refresh();
             },
           )
         ],
@@ -58,13 +59,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Error de conexión',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${snapshot.error}',
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _refresh,
+                              child: const Text('Reintentar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
                   }
                   final products = snapshot.data ?? [];
                   final filtered = products.where((p) => p.title.toLowerCase().contains(_query) || (p.description ?? '').toLowerCase().contains(_query)).toList();
                   if (filtered.isEmpty) return const Center(child: Text('No products'));
                   return RefreshIndicator(
-                    onRefresh: () async => _refresh(),
+                    onRefresh: _refresh,
                     child: ListView.builder(
                       itemCount: filtered.length,
                       itemBuilder: (context, i) => ProductTile(product: filtered[i]),

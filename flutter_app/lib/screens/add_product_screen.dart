@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/cloudinary_service.dart';
 import '../services/api_service.dart';
 
 class AddProductScreen extends StatefulWidget {
@@ -22,8 +22,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.camera, maxWidth: 1200);
-    if (picked != null) setState(() => _image = File(picked.path));
+    final picked = await picker.pickImage(source: ImageSource.camera, maxWidth: 800, imageQuality: 65);
+    if (picked == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se seleccionó ninguna imagen o se denegó el permiso de cámara.')),
+        );
+      }
+      return;
+    }
+    setState(() => _image = File(picked.path));
+  }
+
+  Future<String> _encodeImageAsDataUrl(File imageFile) async {
+    final bytes = await imageFile.readAsBytes();
+    final mimeType = imageFile.path.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    return 'data:$mimeType;base64,${base64Encode(bytes)}';
   }
 
   Future<void> _submit() async {
@@ -33,16 +47,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     try {
       String? imageUrl;
       if (_image != null) {
-        try {
-          imageUrl = await CloudinaryService.uploadImage(_image!);
-        } catch (e) {
-          imageUrl = null;
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('La imagen no se pudo subir, pero el producto se guardó sin imagen.')),
-            );
-          }
-        }
+        imageUrl = await _encodeImageAsDataUrl(_image!);
       }
       await ApiService.createProduct(
         title: _title!,

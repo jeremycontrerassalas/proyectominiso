@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/product.dart';
 
@@ -14,19 +16,46 @@ class ApiService {
     if (!normalizedBase.startsWith('http://') && !normalizedBase.startsWith('https://')) {
       throw Exception('Invalid API_BASE URL: $normalizedBase');
     }
-    return Uri.parse('$normalizedBase$path');
+    final baseUri = Uri.parse(normalizedBase);
+    return baseUri.resolve(path);
+  }
+
+  static void _log(String message) {
+    if (kDebugMode) {
+      debugPrint('[ApiService] $message');
+    }
+  }
+
+  static String _formatNetworkError(Object error, [StackTrace? stackTrace]) {
+    final buffer = StringBuffer()
+      ..write('No se pudo conectar con $baseUrl. ')
+      ..write('Verifica que el dispositivo tenga internet, que el DNS resuelva Railway y que el backend esté activo. ')
+      ..write('Error original: $error');
+    if (stackTrace != null && kDebugMode) {
+      buffer.write('\n$stackTrace');
+    }
+    return buffer.toString();
   }
 
   static Future<List<Product>> fetchProducts() async {
     try {
-      final res = await http.get(_buildUri('/products')).timeout(const Duration(seconds: 20));
+      final uri = _buildUri('/products');
+      _log('GET $uri');
+      final res = await http.get(uri).timeout(const Duration(seconds: 20));
+      _log('GET $uri -> ${res.statusCode}');
       if (res.statusCode == 200) {
         final List data = jsonDecode(res.body) as List;
         return data.map((e) => Product.fromJson(e)).toList();
       }
       throw Exception('Failed to load products: ${res.statusCode} ${res.body}');
-    } on SocketException catch (e) {
-      throw Exception('Network/DNS error reaching $baseUrl: $e');
+    } on SocketException catch (error, stackTrace) {
+      throw Exception(_formatNetworkError(error, stackTrace));
+    } on TimeoutException catch (error, stackTrace) {
+      throw Exception('Timeout waiting for $baseUrl. ${_formatNetworkError(error, stackTrace)}');
+    } on HttpException catch (error, stackTrace) {
+      throw Exception(_formatNetworkError(error, stackTrace));
+    } on HandshakeException catch (error, stackTrace) {
+      throw Exception('TLS/SSL error connecting to $baseUrl. ${_formatNetworkError(error, stackTrace)}');
     }
   }
 
@@ -38,8 +67,10 @@ class ApiService {
     String? imageUrl,
   }) async {
     try {
+      final uri = _buildUri('/products');
+      _log('POST $uri');
       final res = await http.post(
-        _buildUri('/products'),
+        uri,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'},
         body: jsonEncode({
           'title': title,
@@ -54,8 +85,27 @@ class ApiService {
         return Product.fromJson(jsonDecode(res.body));
       }
       throw Exception('Failed to create product: ${res.statusCode} ${res.body}');
-    } on SocketException catch (e) {
-      throw Exception('Network/DNS error reaching $baseUrl: $e');
+    } on SocketException catch (error, stackTrace) {
+      throw Exception(_formatNetworkError(error, stackTrace));
+    } on TimeoutException catch (error, stackTrace) {
+      throw Exception('Timeout waiting for $baseUrl. ${_formatNetworkError(error, stackTrace)}');
+    } on HttpException catch (error, stackTrace) {
+      throw Exception(_formatNetworkError(error, stackTrace));
+    } on HandshakeException catch (error, stackTrace) {
+      throw Exception('TLS/SSL error connecting to $baseUrl. ${_formatNetworkError(error, stackTrace)}');
+    }
+  }
+
+  static Future<bool> ping() async {
+    try {
+      final uri = _buildUri('/health');
+      _log('GET $uri');
+      final res = await http.get(uri).timeout(const Duration(seconds: 10));
+      _log('GET $uri -> ${res.statusCode}');
+      return res.statusCode >= 200 && res.statusCode < 300;
+    } catch (error) {
+      _log('Health check failed: $error');
+      return false;
     }
   }
 }

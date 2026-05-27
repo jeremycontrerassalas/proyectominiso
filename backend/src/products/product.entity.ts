@@ -17,7 +17,7 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'text', name: 'image_url', nullable: true })
+  @Column({ type: 'longtext', name: 'image_url', nullable: true })
   imageUrl?: string;
 
   @CreateDateColumn({ name: 'created_at' })
